@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Data</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            var socket = io();
+
+            // 实时更新 MQTT 数据
+            socket.on('mqtt_message', function (data) {
+                document.getElementById('mqtt_message').innerHTML = data.message;
+            });
+
+            // 发送控制消息到 MQTT control 频道
+            function sendControlMessage(message) {
+                fetch('/send_control', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Control message sent:", message);
+                });
+            }
+
+            // 按钮点击事件
+            document.getElementById('btn_on').addEventListener('click', function() {
+                sendControlMessage('on');
+            });
+
+            document.getElementById('btn_off').addEventListener('click', function() {
+                sendControlMessage('off');
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Temperature and Humidity Now:</h1>
+    <div id="mqtt_message">No message received yet.</div>
+
+    <!-- 控制按钮 -->
+    <h2>Control Panel</h2>
+    <button id="btn_on">Turn ON</button>
+    <button id="btn_off">Turn OFF</button>
+</body>
+</html>
